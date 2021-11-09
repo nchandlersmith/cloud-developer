@@ -1,7 +1,9 @@
 import express from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
-import {error} from "util";
+import * as path from "path";
+import fs from "fs";
+import ErrnoException = NodeJS.ErrnoException;
 
 (async () => {
 
@@ -30,18 +32,25 @@ import {error} from "util";
     the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
   ! END @TODO1
   */
-  app.get("/filteredimage", async (req, res) => {
+  const processImage = async (req: any, res: any, next: any) => {
     const image_url = req.query.image_url as string
     if ( !image_url ) {
       return res.status(400).send({"error": "Missing image_url query parameter."})
     }
-    try {
-      const file = await filterImageFromURL(image_url)
-      return res.status(200).sendFile(file)
-    } catch (error) {
-      return res.status(500).send(error)
-    }
-  })
+    const file = filterImageFromURL(image_url)
+    file
+      .then(file => res.status(200).sendFile(file))
+      .then(() => setTimeout(next, 1000))
+      .catch(error => res.status(500).send(error))
+  }
+
+  const deleteTmpFiles = async (req: any, res: any, next: any) => {
+    const tempDirectory = path.join(__dirname, 'util', 'tmp')
+    const files = fs.readdirSync(tempDirectory).map(file => path.join(tempDirectory, file))
+    await deleteLocalFiles(files)
+  }
+
+  app.get("/filteredimage", processImage, deleteTmpFiles)
 
   // Root Endpoint
   // Displays a simple message to the user
