@@ -44,13 +44,15 @@ import fs from "fs";
     }
     const image_url = req.query.image_url as string
     if ( !image_url ) {
-      return res.status(400).send({"error": "Missing image_url query parameter."})
+      return res.status(400
+      ).send({"error": "Missing image_url query parameter."})
     }
-    const filterImageTimeout = Symbol()
-    await promiseOrTimeout(filterImageFromURL(image_url), 2000, filterImageTimeout)
+    const filterImageTimeoutError = Symbol()
+    const timeout: number = Number(process.env.IMAGE_FILTER_PROCESSING_TIMEOUT)
+    await promiseOrTimeout(filterImageFromURL(image_url), timeout, filterImageTimeoutError)
       .then((file: any) => res.status(200).sendFile(file))
       .catch((error: any) => {
-        if (error === filterImageTimeout) {
+        if (error === filterImageTimeoutError) {
           res.status(422).send({"error": "Could not process an image at the specified url."})
         } else {
           res.status(500).send({"error": error})
