@@ -61,6 +61,10 @@
 						"exec": [
 							"pm.test(\"Status code is 200\", function () {",
 							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is not empty\", function () {",
+							"    pm.expect(responseBody).not.to.be.undefined",
 							"});"
 						],
 						"type": "text/javascript"
