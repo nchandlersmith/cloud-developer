@@ -34,15 +34,10 @@ import {error} from "util";
   ! END @TODO1
   */
 
-  const promiseOrTimeout = (promise: Promise<string>, time: number): any => {
-    const timeout = new Promise((_, rej) => setTimeout(rej, time))
-    Promise.race([promise, timeout])
-  }
-
-  const filterImage = async (image_path: string) => {
-    return filterImageFromURL(image_path)
-      .then(file => file)
-      .catch(error => error)
+  const promiseOrTimeout = (promise: Promise<string>, time: number): Promise<any> => {
+    let timer: NodeJS.Timeout;
+    const timeout = new Promise((_, rej) => timer = setTimeout(rej, time))
+    return Promise.race([promise, timeout]).finally(() => clearTimeout(timer))
   }
 
   const processImage = async (req: any, res: any, next: any) => {
@@ -50,11 +45,9 @@ import {error} from "util";
     if ( !image_url ) {
       return res.status(400).send({"error": "Missing image_url query parameter."})
     }
-    const file = await filterImage(image_url)
-    if (file instanceof Error) {
-      return res.status(500).send({"error": file})
-    }
-    return res.status(200).sendFile(file)
+    await promiseOrTimeout(filterImageFromURL(image_url), 2000)
+      .then((file: any) => res.status(200).sendFile(file))
+      .catch((error: any) => res.status(500).send({"error": error}))
   }
 
   const deleteTmpFiles = async (req: any, res: any, next: any) => {
