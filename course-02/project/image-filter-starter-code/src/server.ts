@@ -3,8 +3,6 @@ import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 import * as path from "path";
 import fs from "fs";
-import ErrnoException = NodeJS.ErrnoException;
-import {error} from "util";
 
 (async () => {
 
@@ -41,6 +39,9 @@ import {error} from "util";
   }
 
   const processImage = async (req: any, res: any, next: any) => {
+    if (req.get("x-api-key") !== "5c76470e-f25a-4d90-a674-1854ecd1385e") {
+      return res.status(403).send({"error": "Not authorized. Sad day. :("})
+    }
     const image_url = req.query.image_url as string
     if ( !image_url ) {
       return res.status(400).send({"error": "Missing image_url query parameter."})
