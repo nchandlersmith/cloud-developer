@@ -453,12 +453,20 @@
 	],
 	"variable": [
 		{
-			"key": "HOST",
+			"key": "localHost",
 			"value": "localhost:8082"
 		},
 		{
 			"key": "API_KEY",
 			"value": "90e255b4-414b-4176-aeaa-4aa66866aa17"
+		},
+		{
+			"key": "remoteHost",
+			"value": "ec2-107-22-126-247.compute-1.amazonaws.com"
+		},
+		{
+			"key": "HOST",
+			"value": "{{remoteHost}}"
 		}
 	]
 }
