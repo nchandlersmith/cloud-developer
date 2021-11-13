@@ -39,7 +39,7 @@ import fs from "fs";
   }
 
   const processImage = async (req: any, res: any, next: any) => {
-    if (req.get("x-api-key") !== "5c76470e-f25a-4d90-a674-1854ecd1385e") {
+    if (req.get("x-api-key") !== process.env.IMAGE_FILTER_X_API_KEY) {
       return res.status(403).send({"error": "Not authorized. Sad day. :("})
     }
     const image_url = req.query.image_url as string
