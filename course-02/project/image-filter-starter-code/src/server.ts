@@ -34,9 +34,9 @@ import {error} from "util";
   ! END @TODO1
   */
 
-  const promiseOrTimeout = (promise: Promise<string>, time: number): Promise<any> => {
+  const promiseOrTimeout = (promise: Promise<string>, time: number, exception: Error): Promise<any> => {
     let timer: NodeJS.Timeout;
-    const timeout = new Promise((_, rej) => timer = setTimeout(rej, time))
+    const timeout = new Promise((_, rej) => timer = setTimeout(rej, time, exception))
     return Promise.race([promise, timeout]).finally(() => clearTimeout(timer))
   }
 
@@ -45,7 +45,8 @@ import {error} from "util";
     if ( !image_url ) {
       return res.status(400).send({"error": "Missing image_url query parameter."})
     }
-    await promiseOrTimeout(filterImageFromURL(image_url), 2000)
+    const filterImageTimeout = new Error('Timeout while filtering image.')
+    await promiseOrTimeout(filterImageFromURL(image_url), 2000, filterImageTimeout)
       .then((file: any) => res.status(200).sendFile(file))
       .catch((error: any) => res.status(500).send({"error": error}))
   }
