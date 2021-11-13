@@ -68,8 +68,8 @@ import fs from "fs";
       return res.status(400).send({"error": "Missing image_url query parameter."})
     }
     const filterImageTimeoutError = Symbol()
-    const processingTimeout: number = Number(process.env.IMAGE_FILTER_PROCESSING_TIMEOUT || 2000)
-    const sendTimeout: number = Number(process.env.IMAGE_FILTER_SEND_IMAGE_TIMEOUT || 1000)
+    const processingTimeout: number = Number(process.env.IMAGE_FILTER_PROCESSING_TIMEOUT) || 2000
+    const sendTimeout: number = Number(process.env.IMAGE_FILTER_SEND_IMAGE_TIMEOUT) || 1000
     await promiseOrTimeout(filterImageFromURL(image_url), processingTimeout, filterImageTimeoutError)
       .then((file: string | symbol) => {
         res.status(200).sendFile(file)
