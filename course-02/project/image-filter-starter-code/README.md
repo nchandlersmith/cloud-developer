@@ -46,3 +46,35 @@ Prevent requests without valid authentication headers.
 
 Add your own domain name and have it point to the running services (try adding a subdomain name to point to the processing server)
 > !NOTE: Domain names are not included in AWS’ free tier and will incur a cost.
+
+## Notes for evaluator
+
+### Environment variables
+
+- `IMAGE_FILTER_PROCESSING_TIMEOUT`
+  - Units: ms
+  - Default: 2000
+  - Use: Timeout for fetching the processing the image.
+- `IMAGE_FILTER_SEND_IMAGE_TIMEOUT`
+  - Units: ms
+  - Default: 1000
+  - Use: Timeout for sending the response to user. When exceeded, cleanup from processing the image is performed.
+- `PORT`
+  - Units: no dimension
+  - Default: 8082
+  - Use: Port the application listens on
+- `IMAGE_FILTER_X_API_KEY`
+  - Units: no dimension
+  - Default: redacted
+  - Use: This single key must appear in the `x-api-key` header; otherwise, response status is 400.
+
+### Postman Collection Variables
+
+- `localHost`: Set the `HOST` variable to use this variable to test locally
+- `remoteHost`: Set the `HOST` variable to use this variable to test against the deployed endpoint
+- `API_KEY`: Must match the `IMAGE_FILTER_X_API_KEY` environment variable.
+- `HOST`: This is the host that the requests run against. I typically create separate variables for the hosts that I want to interact with. Then set this value to point to one of those values. See `localHost` and `remoteHost`.
+
+### Postman Tests
+
+Several tests have been included for this project. See [Postman Collection Variables](#Postman Colection Variables).
