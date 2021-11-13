@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "8a1818c0-6eeb-4397-9b3b-1679110da2b3",
+		"_postman_id": "7a97db6d-2d5a-40fb-b7a5-81ca954316f6",
 		"name": "cloud-cdnd-c2-final",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -370,7 +370,7 @@
 			"response": []
 		},
 		{
-			"name": "hangs",
+			"name": "does not hang",
 			"event": [
 				{
 					"listen": "test",
@@ -462,7 +462,7 @@
 		},
 		{
 			"key": "remoteHost",
-			"value": "ec2-107-22-126-247.compute-1.amazonaws.com"
+			"value": "image-filter-dev.us-east-1.elasticbeanstalk.com"
 		},
 		{
 			"key": "HOST",
