@@ -4,6 +4,7 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 import * as path from "path";
 import fs from "fs";
 import ErrnoException = NodeJS.ErrnoException;
+import {error} from "util";
 
 (async () => {
 
@@ -32,16 +33,28 @@ import ErrnoException = NodeJS.ErrnoException;
     the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
   ! END @TODO1
   */
+
+  const promiseOrTimeout = (promise: Promise<string>, time: number): any => {
+    const timeout = new Promise((_, rej) => setTimeout(rej, time))
+    Promise.race([promise, timeout])
+  }
+
+  const filterImage = async (image_path: string) => {
+    return filterImageFromURL(image_path)
+      .then(file => file)
+      .catch(error => error)
+  }
+
   const processImage = async (req: any, res: any, next: any) => {
     const image_url = req.query.image_url as string
     if ( !image_url ) {
       return res.status(400).send({"error": "Missing image_url query parameter."})
     }
-    const file = filterImageFromURL(image_url)
-    file
-      .then(file => res.status(200).sendFile(file))
-      .then(() => setTimeout(next, 1000))
-      .catch(error => res.status(500).send(error))
+    const file = await filterImage(image_url)
+    if (file instanceof Error) {
+      return res.status(500).send({"error": file})
+    }
+    return res.status(200).sendFile(file)
   }
 
   const deleteTmpFiles = async (req: any, res: any, next: any) => {
