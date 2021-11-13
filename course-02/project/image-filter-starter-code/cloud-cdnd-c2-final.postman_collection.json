@@ -1,59 +1,12 @@
 {
 	"info": {
-		"_postman_id": "f80b6c8d-bd3f-484d-bdf9-fd1dc951c2db",
+		"_postman_id": "8a1818c0-6eeb-4397-9b3b-1679110da2b3",
 		"name": "cloud-cdnd-c2-final",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "http://localhost:8082/filteredimage?image_url=https://timedotcom.files.wordpress.com/2019/03/kitten-report.jpg",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 200\", function () {",
-							"    pm.response.to.have.status(500);",
-							"});",
-							"",
-							"pm.test(\"Body matches string\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"error\");",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "x-api-key",
-						"value": "{{API_KEY}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "http://{{HOST}}/filteredimage?image_url=https://timedotcom.files.wordpress.com/2019/03/kitten-report.jpg",
-					"protocol": "http",
-					"host": [
-						"{{HOST}}"
-					],
-					"path": [
-						"filteredimage"
-					],
-					"query": [
-						{
-							"key": "image_url",
-							"value": "https://timedotcom.files.wordpress.com/2019/03/kitten-report.jpg"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "happy path",
+			"name": "success png",
 			"event": [
 				{
 					"listen": "test",
@@ -100,14 +53,108 @@
 			"response": []
 		},
 		{
+			"name": "success jpg",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Body is not empty\", function () {",
+							"    pm.expect(responseBody).not.to.be.undefined",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{HOST}}/filteredimage?image_url=https://www.dccomics.com/sites/default/files/DCFD2021_Marquee_Char_Batman_612e82ad4853f3.20804690.jpg",
+					"protocol": "http",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"filteredimage"
+					],
+					"query": [
+						{
+							"key": "image_url",
+							"value": "https://www.dccomics.com/sites/default/files/DCFD2021_Marquee_Char_Batman_612e82ad4853f3.20804690.jpg"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "fail kitten",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 422\", function () {",
+							"    pm.response.to.have.status(422);",
+							"});",
+							"",
+							"pm.test(\"Body has specific error\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"\\\"error\\\":\\\"Could not find MIME for Buffer <null>\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{HOST}}/filteredimage?image_url=https://upload.wikimedia.org/wikipedia/commons/b/bd/Golden_tabby_and_white_kitten_n01.jpg",
+					"protocol": "http",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"filteredimage"
+					],
+					"query": [
+						{
+							"key": "image_url",
+							"value": "https://upload.wikimedia.org/wikipedia/commons/b/bd/Golden_tabby_and_white_kitten_n01.jpg"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "bad image",
 			"event": [
 				{
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Status code is 500\", function () {",
-							"    pm.response.to.have.status(500);",
+							"pm.test(\"Status code is 422\", function () {",
+							"    pm.response.to.have.status(422);",
 							"});",
 							"",
 							"pm.test(\"Body has an error field\", function () {",
@@ -140,53 +187,6 @@
 						{
 							"key": "image_url",
 							"value": "https://foo.bar"
-						}
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "hangs",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"pm.test(\"Status code is 422\", function () {",
-							"    pm.response.to.have.status(422);",
-							"});",
-							"",
-							"pm.test(\"Body has specific error\", function () {",
-							"    pm.expect(pm.response.text()).to.include(\"\\\"error\\\":\\\"Could not process an image at the specified url.\\\"\");",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "x-api-key",
-						"value": "{{API_KEY}}",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "http://{{HOST}}/filteredimage?image_url=https://unl.edu",
-					"protocol": "http",
-					"host": [
-						"{{HOST}}"
-					],
-					"path": [
-						"filteredimage"
-					],
-					"query": [
-						{
-							"key": "image_url",
-							"value": "https://unl.edu"
 						}
 					]
 				}
@@ -363,6 +363,53 @@
 						{
 							"key": "image_url",
 							"value": "https://www.thehappymovie.com/wp-content/themes/happy/images/logo.png"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "hangs",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 422\", function () {",
+							"    pm.response.to.have.status(422);",
+							"});",
+							"",
+							"pm.test(\"Body has specific error\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"\\\"error\\\":\\\"Timed out while processing image.\\\"\");",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-api-key",
+						"value": "{{API_KEY}}",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "http://{{HOST}}/filteredimage?image_url=https://unl.edu",
+					"protocol": "http",
+					"host": [
+						"{{HOST}}"
+					],
+					"path": [
+						"filteredimage"
+					],
+					"query": [
+						{
+							"key": "image_url",
+							"value": "https://unl.edu"
 						}
 					]
 				}

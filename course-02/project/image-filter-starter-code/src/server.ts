@@ -50,11 +50,12 @@ import fs from "fs";
     setTimeout(next, timeout)
   }
 
-  const sendError = (error: unknown, timeoutError: symbol, res: any) => {
+  const sendError = (error: Error|Symbol, timeoutError: symbol, res: any) => {
     if (error === timeoutError) {
-      res.status(422).send({"error": "Could not process an image at the specified url."})
+      res.status(422).send({"error": "Timed out while processing image."})
     } else {
-      res.status(500).send({"error": error})
+      error = error as Error // symbol exited above
+      res.status(422).send({"error": error.message})
     }
   }
 
