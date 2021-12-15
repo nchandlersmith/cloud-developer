@@ -1,44 +1,74 @@
 const AWS = require('aws-sdk')
 const axios = require('axios')
 
-// Name of a service, any string
 const serviceName = process.env.SERVICE_NAME
-// URL of a service to test
-const url = process.env.URL
-
-// CloudWatch client
-const cloudwatch = new AWS.CloudWatch();
+const testUrl = process.env.URL
 
 exports.handler = async (event) => {
-  // TODO: Use these variables to record metric values
   let endTime
   let requestWasSuccessful
 
-  const startTime = timeInMs()
-  await axios.get(url)
+  const startTime = timeInMillis()
 
-  // Example of how to write a single data point
-  // await cloudwatch.putMetricData({
-  //   MetricData: [
-  //     {
-  //       MetricName: 'MetricName', // Use different metric names for different values, e.g. 'Latency' and 'Successful'
-  //       Dimensions: [
-  //         {
-  //           Name: 'ServiceName',
-  //           Value: serviceName
-  //         }
-  //       ],
-  //       Unit: '', // 'Count' or 'Milliseconds'
-  //       Value: 0 // Total value
-  //     }
-  //   ],
-  //   Namespace: 'Udacity/Serveless'
-  // }).promise()
+  try {
+    await axios.get(testUrl)
+    endTime = timeInMillis()
+    requestWasSuccessful = 1
+  } catch(error) {
+    console.error(error)
+    endTime = timeInMillis()
+    requestWasSuccessful = 0
+  }
 
-  // TODO: Record time it took to get a response
-  // TODO: Record if a response was successful or not
+  const elapsedTime = endTime - startTime
+  try {
+    await updateCloudWatch('Latency', elapsedTime)
+    await updateCloudWatch('Successful', requestWasSuccessful)
+  } catch (error) {
+    console.error(error)
+    return {
+      status: 500
+    }
+  }
+  return {
+    status: 200,
+    body: {
+      message: 'Success',
+      latency: `${elapsedTime} ms`,
+      successful: `${requestWasSuccessful} count`  
+    }
+  }
+
 }
 
-function timeInMs() {
+function timeInMillis() {
   return new Date().getTime()
 }
+
+async function updateCloudWatch(metricName, value) {
+  const metricNameToUnits = {
+    Latency: 'Milliseconds',
+    Successful: 'Count'
+  }
+
+  const unit = metricNameToUnits[metricName]
+
+  await new AWS.CloudWatch().putMetricData({
+    MetricData: [
+      {
+        MetricName: metricName, 
+        Dimensions: [
+          {
+            Name: 'ServiceName',
+            Value: serviceName
+          }
+        ],
+        Unit: unit,
+        Value: value
+      }
+    ],
+    Namespace: 'Udacity/Serveless'
+  }).promise()
+}
+
+
