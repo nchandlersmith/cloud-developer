@@ -16,22 +16,19 @@ exports.handler = async (event) => {
   // HINT: You might find the following method useful to get an incoming parameter value
   // getQueryParameter(event, 'param')
 
+  const nextKey = getQueryParameter(event, 'nextKey');
+  const limit = getQueryParameter(event, 'limit')
+
   // TODO: Return 400 error if parameters are invalid
-
-  // Scan operation parameters
-  const scanParams = {
-    TableName: groupsTable,
-    // TODO: Set correct pagination parameters
-    // Limit: ???,
-    // ExclusiveStartKey: ???
+  if (nextKey === undefined) {
+    return buildMissingParamResponse(nextKey)
   }
-  console.log('Scan params: ', scanParams)
 
-  const result = await docClient.scan(scanParams).promise()
+  if (limit === undefined) {
+    return buildMissingParamResponse(limit)
+  }
 
-  const items = result.Items
-
-  console.log('Result: ', result)
+const result = await getDataFromDynamo(limit ,nextKey)
 
   // Return result
   return {
@@ -77,4 +74,31 @@ function encodeNextKey(lastEvaluatedKey) {
   }
 
   return encodeURIComponent(JSON.stringify(lastEvaluatedKey))
+}
+
+function buildMissingParamResponse(missingParam) {
+  return {
+    status: 400,
+    body: JSON.stringify({message: `Request missing the following query param: ${missingParam}`})
+  }
+}
+
+
+async function getDataFromDynamo(limit, nextKey) {
+  // Scan operation parameters
+  const scanParams = {
+    TableName: groupsTable,
+    // TODO: Set correct pagination parameters
+    Limit: limit,
+    ExclusiveStartKey: nextKey
+  }
+  console.log('Scan params: ', scanParams)
+
+  const result = await docClient.scan(scanParams).promise()
+
+  const items = result.Items
+
+  console.log('Result: ', result)
+  
+  return items
 }
