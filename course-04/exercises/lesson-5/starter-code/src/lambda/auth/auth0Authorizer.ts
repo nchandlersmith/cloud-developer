@@ -5,7 +5,6 @@ import { secretsManager } from 'middy/middlewares'
 
 import { verify } from 'jsonwebtoken'
 import { JwtToken } from '../../auth/JwtToken'
-import { cert } from '../../auth/utils'
 
 const secretId = process.env.AUTH_0_SECRET_ID
 const secretField = process.env.AUTH_0_SECRET_FIELD
@@ -60,11 +59,7 @@ function verifyToken(authHeader: string, secret: string): JwtToken {
   const split = authHeader.split(' ')
   const token = split[1]
 
-  return verify(
-    token, 
-    cert, 
-    { algorithms: [ 'RS256' ]}
-    ) as JwtToken
+  return verify(token, secret) as JwtToken
 }
 
 handler.use(
